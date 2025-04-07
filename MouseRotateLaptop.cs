@@ -22,8 +22,12 @@ public class MouseRotateLaptop : MonoBehaviour
         basePosition = transform.position; // Store the current position of the object
         previousRotation = transform.rotation;
 
-        // Check if device supports touch input or debug flag is set
-        isTouchDevice = Input.touchSupported || debugSimulateTouchDevice;
+        // More specific touch detection
+        #if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+            isTouchDevice = true;
+        #else
+            isTouchDevice = debugSimulateTouchDevice;
+        #endif
 
         // Laptop responsiveness (moving further from right of vierport on small screens)
         // CheckViewportWidth();

@@ -84,12 +84,12 @@ public class MobileVersion : MonoBehaviour
                 eulerAngles.y = NormalizeAngle(eulerAngles.y);
                 
                 // Apply very subtle scaling (0.1 = 10% of original movement)
-                eulerAngles.x *= -0.6f; // Double vertical movement
-                eulerAngles.y *= 0.6f;  // Double horizontal movement
+                eulerAngles.x *= -0.8f; // Double vertical movement
+                eulerAngles.y *= 0.8f;  // Double horizontal movement
                 
-                // Strictly limit rotation range to ±7.5 degrees
-                eulerAngles.x = Mathf.Clamp(eulerAngles.x, -7.5f, 7.5f);
-                eulerAngles.y = Mathf.Clamp(eulerAngles.y, -7.5f, 7.5f);
+                // Strictly limit rotation range to ±10 degrees
+                eulerAngles.x = Mathf.Clamp(eulerAngles.x, -16f, 10f); // More allowance for downward rotation
+                eulerAngles.y = Mathf.Clamp(eulerAngles.y, -10f, 10f);
                 eulerAngles.z = 0f; // Prevent any z-axis rotation
                 
                 // Create target rotation relative to initial position
@@ -141,7 +141,7 @@ public class MobileVersion : MonoBehaviour
 
     public bool screenIsMobile()
     {
-        bool isMobile = Screen.width < 767;
+        bool isMobile = Screen.width < 1024;
         return isMobile;
     }
 }
