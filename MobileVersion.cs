@@ -88,8 +88,8 @@ public class MobileVersion : MonoBehaviour
                 eulerAngles.y *= 0.8f;  // Double horizontal movement
                 
                 // Strictly limit rotation range to ±10 degrees
-                eulerAngles.x = Mathf.Clamp(eulerAngles.x, -16f, 10f); // More allowance for downward rotation
-                eulerAngles.y = Mathf.Clamp(eulerAngles.y, -10f, 10f);
+                eulerAngles.x = Mathf.Clamp(eulerAngles.x, -6f, 10f); // More allowance for downward rotation
+                eulerAngles.y = Mathf.Clamp(eulerAngles.y, -5f, 5f);
                 eulerAngles.z = 0f; // Prevent any z-axis rotation
                 
                 // Create target rotation relative to initial position

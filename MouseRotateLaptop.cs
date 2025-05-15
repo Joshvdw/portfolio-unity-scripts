@@ -16,6 +16,8 @@ public class MouseRotateLaptop : MonoBehaviour
     public LaptopAnimations laptopAnimations;
     public const float targetWidth = 1300f; // Target width threshold in pixels
     private bool isTouchDevice = false;
+    private const int minScreenWidth = 1024; // Minimum screen width to enable mouse rotation
+    private const float minXRotation = -5f; // Minimum X rotation limit
 
     private void Start()
     {
@@ -36,15 +38,15 @@ public class MouseRotateLaptop : MonoBehaviour
 
     private void Update()
     {
-        // Only run mouse rotation if it's NOT a touch device
-        if (!isTouchDevice)
+        // Only run mouse rotation if it's NOT a touch device AND screen width is above minimum
+        if (!isTouchDevice && Screen.width > minScreenWidth)
         {
             // Get mouse position as a value between -1 and 1
             float mouseXNormalized = (Input.mousePosition.x / Screen.width) * 2 - 1;
             float mouseYNormalized = (Input.mousePosition.y / Screen.height) * 2 - 1;
 
             // Calculate rotation angles based on mouse position
-            float targetRotationX = Mathf.Clamp(mouseYNormalized * rotationAmount * -1, -rotationAmount, rotationAmount);
+            float targetRotationX = Mathf.Clamp(mouseYNormalized * rotationAmount * -1, minXRotation, rotationAmount);
             float targetRotationY = Mathf.Clamp(mouseXNormalized * rotationAmount * -1, -rotationAmount, rotationAmount);
 
             Quaternion targetRotation = Quaternion.Euler(targetRotationX, targetRotationY, 0);
@@ -72,7 +74,7 @@ public class MouseRotateLaptop : MonoBehaviour
 
     void SmoothRotateLaptopChild()
     {
-        if (laptopChild != null && !isTouchDevice)  // Only run on desktop
+        if (laptopChild != null && !isTouchDevice && Screen.width > minScreenWidth)  // Only run on desktop with sufficient screen width
         {
             Quaternion childRotation = laptopChild.transform.localRotation;
 

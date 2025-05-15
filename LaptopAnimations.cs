@@ -17,6 +17,7 @@ public class LaptopAnimations : MonoBehaviour
     private bool isOffScreen = false;
     public bool hasStarted = false; 
     public MobileVersion mobileVersion;
+    public UnityToReact unityToReact; // Reference to UnityToReact component
 
     private void Start()
     {
@@ -185,7 +186,7 @@ public class LaptopAnimations : MonoBehaviour
 
         if (mobileVersion.screenIsMobile()) {
             // Set initial X rotation
-            transform.rotation = Quaternion.Euler(10f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+            // transform.rotation = Quaternion.Euler(10f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
             // Only rotate on Y axis
             mySequence.Append(transform.DORotate(new Vector3(0, -360, 0), duration, RotateMode.LocalAxisAdd)
                 .SetEase(Ease.InOutQuad));
@@ -203,7 +204,7 @@ public class LaptopAnimations : MonoBehaviour
 
         if (mobileVersion.screenIsMobile()) {
             // Set initial X rotation
-            transform.rotation = Quaternion.Euler(10f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+            // transform.rotation = Quaternion.Euler(10f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
             // Only rotate on Y axis
             mySequence.Append(transform.DORotate(new Vector3(0, 360, 0), duration, RotateMode.LocalAxisAdd)
                 .SetEase(Ease.InOutQuad));
@@ -342,6 +343,26 @@ public class LaptopAnimations : MonoBehaviour
             transformParent.position = worldPosition;
             // Reset local position of the laptop relative to its parent
             transform.localPosition = Vector3.zero;
+        }
+    }
+
+    // LAPTOP CLICK EVENTS
+    void OnMouseDown()
+    {
+        Debug.Log("GameObject was clicked!");
+        SendLaptopClickedMessage();
+    }
+
+
+    public void SendLaptopClickedMessage()
+    {
+        if (unityToReact != null)
+        {
+            unityToReact.sndMsg("LAPTOP_CLICKED");
+        }
+        else
+        {
+            Debug.LogWarning("UnityToReact reference not set. Cannot send message to React.");
         }
     }
 }
