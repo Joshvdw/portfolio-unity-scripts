@@ -86,28 +86,16 @@ public class UnityFromReact : MonoBehaviour
         }
     }
 
-    //  TABLET SIZE CHECK
-    public void isTabletSize(string isTablet)
+    //  MOBILE SIZE SWITCHER
+    public void isMobileSize(string arg)
     {
-        if (isTablet == "true")
+        if (arg == "true")
         {
-            animScript.ScaleLaptopToSmall();
+            animScript.MoveLaptopToMobilePosition();
         }
         else
         {
-            animScript.ScaleLaptopToNormal();
-        }
-    }
-    //  MOBILE SIZE CHECK
-    public void isMobileSize(string isMobile)
-    {
-        if (isMobile == "true")
-        {
-            // animScript.MoveLaptopToMobilePosition();
-        }
-        else
-        {
-            // animScript.MoveLaptopToNormalPosition();
+            animScript.MoveLaptopToDesktopPosition();
         }
     }
 }

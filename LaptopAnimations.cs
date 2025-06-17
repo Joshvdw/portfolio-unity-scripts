@@ -18,6 +18,9 @@ public class LaptopAnimations : MonoBehaviour
     public bool hasStarted = false; 
     public MobileVersion mobileVersion;
     public UnityToReact unityToReact; // Reference to UnityToReact component
+    public GradientAnimator gradientScript;
+    public MouseRotateLaptop mouseScript;
+
 
     private void Start()
     {
@@ -98,29 +101,29 @@ public class LaptopAnimations : MonoBehaviour
         }
     }
 
-    private void SmoothResetOrientation()
-    {
-        // Kill any active reset sequence
-        if (resetSequence.IsActive())
-        {
-            resetSequence.Kill();
-        }
+    // private void SmoothResetOrientation()
+    // {
+    //     // Kill any active reset sequence
+    //     if (resetSequence.IsActive())
+    //     {
+    //         resetSequence.Kill();
+    //     }
         
-        // Clear and reuse the sequence
-        resetSequence.SetAutoKill(false);
-        resetSequence.Complete(); // Ensure any previous animation is finished
-        resetSequence.Kill(true); // Kill and reset the sequence
+    //     // Clear and reuse the sequence
+    //     resetSequence.SetAutoKill(false);
+    //     resetSequence.Complete(); // Ensure any previous animation is finished
+    //     resetSequence.Kill(true); // Kill and reset the sequence
         
-        // Get current rotation and create target rotation
-        Vector3 currentRotation = transform.rotation.eulerAngles;
-        Quaternion targetRotation = Quaternion.Euler(10f, 0f, currentRotation.z);
+    //     // Get current rotation and create target rotation
+    //     Vector3 currentRotation = transform.rotation.eulerAngles;
+    //     Quaternion targetRotation = Quaternion.Euler(10f, 0f, currentRotation.z);
         
-        // Match the mouse movement's floaty feel but twice as slow
-        resetSequence.Append(transform.DORotateQuaternion(targetRotation, 1f) // Twice the original duration
-            .SetEase(Ease.OutQuad)); // Keep same easing for smooth feel
+    //     // Match the mouse movement's floaty feel but twice as slow
+    //     resetSequence.Append(transform.DORotateQuaternion(targetRotation, 1f) // Twice the original duration
+    //         .SetEase(Ease.OutQuad)); // Keep same easing for smooth feel
             
-        resetSequence.Play();
-    }
+    //     resetSequence.Play();
+    // }
 
     // LOAD IN ANIMATION
     public void LoadInAnimation()
@@ -291,7 +294,7 @@ public class LaptopAnimations : MonoBehaviour
             currentRotation.y += 24f;
             transform.rotation = Quaternion.Euler(currentRotation);
         }
-        
+        hasStarted = false; 
         mySequence.Restart();
     }
 
@@ -317,33 +320,82 @@ public class LaptopAnimations : MonoBehaviour
         }
     }
 
+    private float heroMoveAmount = 5f;
+
     public void MoveLaptopToMobilePosition()
     {
         if (transformParent != null)
         {
-            Vector3 screenPosition = new Vector3(Screen.width / 2f, 0f, 0f);
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, transformParent.position.z));
-            worldPosition.y = 14f; // Position higher up for mobile
-            transformParent.position = worldPosition;
-            // Reset local position of the laptop relative to its parent
-            transform.localPosition = Vector3.zero;
-            // Reset Y rotation to 0 for mobile
-            Vector3 currentRotation = transform.rotation.eulerAngles;
-            transform.rotation = Quaternion.Euler(10f, 0f, currentRotation.z);
+            if (hasStarted) {
+                //WORK POSITION MOVE MOBILE
+                gradientScript.MoveRadialGradientToMobileWork();
+
+                // Center the laptop on screen
+                CenterLaptop();
+            } else {
+                //  HERO POSITION MOVE MOBILE
+                gradientScript.MoveRadialGradientToMobileHero();
+
+                // Center the laptop on screen
+                CenterLaptop();
+            }
         }
     }
 
-    public void MoveLaptopToNormalPosition()
+    public void MoveLaptopToDesktopPosition()
     {
         if (transformParent != null)
         {
-            Vector3 screenPosition = new Vector3(Screen.width / 2f, 0f, 0f);
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, transformParent.position.z));
-            worldPosition.y = 3.5f; // Normal position
-            transformParent.position = worldPosition;
-            // Reset local position of the laptop relative to its parent
-            transform.localPosition = Vector3.zero;
+            if (hasStarted) {
+                //WORK POSITION MOVE DESKTOP
+                gradientScript.MoveRadialGradientToDesktop();
+
+                // Move laptop to desktop position using screen coordinates
+                Vector3 screenPosition = new Vector3(Screen.width / 2f, 0f, 0f);
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, transformParent.position.z));
+                worldPosition.x = 6.5f;
+                worldPosition.y = -2f;
+                transformParent.position = worldPosition;
+
+                transform.localScale = Vector3.one * 1.2f;
+
+                mouseScript.resetChildRotation = true;
+                Vector3 currentRotation = transform.rotation.eulerAngles;
+                transform.rotation = Quaternion.Euler(currentRotation.x, -18f, currentRotation.z);
+            } else {
+                //  HERO POSITION MOVE DESKTOP
+                gradientScript.MoveRadialGradientToDesktop();
+
+                // Move laptop to desktop position using screen coordinates
+                Vector3 screenPosition = new Vector3(Screen.width / 2f, 0f, 0f);
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, transformParent.position.z));
+                worldPosition.x = -6f;
+                worldPosition.y = -2f;
+                transformParent.position = worldPosition;
+
+                transform.localScale = Vector3.one * 1.2f;
+
+                mouseScript.resetChildRotation = true;
+                Vector3 currentRotation = transform.rotation.eulerAngles;
+                transform.rotation = Quaternion.Euler(currentRotation.x, 8f, currentRotation.z);
+            }
         }
+    }
+
+    public void CenterLaptop()
+    {
+        Vector3 screenPosition = new Vector3(Screen.width / 2f, 0f, 0f);
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, transformParent.position.z));
+        worldPosition.y = 3.5f;
+        transformParent.position = worldPosition;
+
+        // Reset scale
+        transform.localScale = Vector3.one * 1.0f;
+
+        // Reset rotations
+        mouseScript.resetChildRotation = false;
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+        transform.rotation = Quaternion.Euler(10f, 0f, currentRotation.z);
     }
 
     // LAPTOP CLICK EVENTS
@@ -351,6 +403,30 @@ public class LaptopAnimations : MonoBehaviour
     {
         Debug.Log("GameObject was clicked!");
         SendLaptopClickedMessage();
+    }
+
+    void OnMouseEnter()
+    {
+        if (unityToReact != null)
+        {
+            unityToReact.sndMsg("LAPTOP_HOVERED");
+        }
+        else
+        {
+            Debug.LogWarning("UnityToReact reference not set. Cannot send hover message to React.");
+        }
+    }
+
+    void OnMouseExit()
+    {
+        if (unityToReact != null)
+        {
+            unityToReact.sndMsg("LAPTOP_HOVERED_OFF");
+        }
+        else
+        {
+            Debug.LogWarning("UnityToReact reference not set. Cannot send hover off message to React.");
+        }
     }
 
 

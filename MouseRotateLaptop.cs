@@ -14,10 +14,12 @@ public class MouseRotateLaptop : MonoBehaviour
     private Quaternion previousRotation;
     private Vector3 basePosition;
     public LaptopAnimations laptopAnimations;
+    public MobileVersion mobileVersion;
     public const float targetWidth = 1300f; // Target width threshold in pixels
     private bool isTouchDevice = false;
     private const int minScreenWidth = 1024; // Minimum screen width to enable mouse rotation
     private const float minXRotation = -5f; // Minimum X rotation limit
+    public bool resetChildRotation = true;
 
     private void Start()
     {
@@ -67,7 +69,10 @@ public class MouseRotateLaptop : MonoBehaviour
         }
 
         // Ensure laptopChild's x and z rotations are 0
-        SmoothRotateLaptopChild();
+        if (resetChildRotation && !mobileVersion.screenIsMobile())
+        {
+            SmoothRotateLaptopChild();
+        }
 
         FloatEffect();
     }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
-
+using UnityEngine.Scripting;
+[Preserve]
 public class GradientAnimator : MonoBehaviour
 {
     public Material material;
@@ -42,6 +43,7 @@ public class GradientAnimator : MonoBehaviour
     public float minLightWork = 0f;
     public float maxLightWork = 1.5f;
     public MobileVersion mobileVersion;
+    private Vector3 desktopPosition;
 
 
     void Start()
@@ -52,10 +54,13 @@ public class GradientAnimator : MonoBehaviour
         // Initialize material properties
         ResetToDefaultState();
 
+        // store default position as variable before possible mobile changes 
+        desktopPosition = transform.position;
+
         // Reposition the plane for non-mobile screens
         if (mobileVersion.screenIsMobile())
         {
-            transform.position = new Vector3(6f, 8f, transform.position.z);
+            MoveRadialGradientToMobileHero();
         }
 
         // Gradient shifter code
@@ -125,7 +130,7 @@ public class GradientAnimator : MonoBehaviour
         // Reposition the plane for non-mobile screens
         if (mobileVersion.screenIsMobile())
         {
-            transform.position = new Vector3(-12.5f, 8f, transform.position.z);
+            MoveRadialGradientToMobileWork();
         }
         hasStarted = true;
         StartCoroutine(FadeOutRedAndFadeInRadialGradientCoroutine());
@@ -242,7 +247,7 @@ public void ReverseFadeOutRedAndFadeInRadialGradient()
      // Reposition the plane for non-mobile screens
     if (mobileVersion.screenIsMobile())
     {
-        transform.position = new Vector3(6f, 8f, transform.position.z);
+        MoveRadialGradientToMobileHero();
     }
     StartCoroutine(ReverseFadeOutRedAndFadeInRadialGradientCoroutine());
 }
@@ -305,5 +310,17 @@ private IEnumerator FadeInRedCoroutine()
         material.SetColor(radialGradientColorProperty, targetColor);
     }
 
+    public void MoveRadialGradientToMobileHero()
+    {
+        transform.position = new Vector3(6f, 8f, transform.position.z);
+    }
+    public void MoveRadialGradientToMobileWork()
+    {
+        transform.position = new Vector3(-12.5f, 8f, transform.position.z);
+    }
+    public void MoveRadialGradientToDesktop()
+    {
+        transform.position = desktopPosition;
+    }
 
 }
