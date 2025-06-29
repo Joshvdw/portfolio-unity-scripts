@@ -171,14 +171,14 @@ public class GradientAnimator : MonoBehaviour
 
             // Calculate new opacity using interpolation with quadratic easing for faster fade-in
             float t = Mathf.Pow(elapsedTime / longerDuration, 2.0f); // Adjust this exponent for faster acceleration
-            float newOpacity = Mathf.Lerp(initialOpacity, 1.0f, t);
+            float newOpacity = Mathf.Lerp(initialOpacity, 0.6f, t);
             material.SetFloat("_RadialGradientOpacity", newOpacity);
 
             yield return null; // Wait for the next frame
         }
 
         // Ensure final opacity is set precisely
-        material.SetFloat("_RadialGradientOpacity", 1.0f);
+        material.SetFloat("_RadialGradientOpacity", 0.6f);
     }
 
     // Function to fade in radial gradient independently with delay
@@ -203,14 +203,14 @@ public class GradientAnimator : MonoBehaviour
 
             // Calculate new opacity using interpolation with quadratic easing for faster fade-in
             float t = Mathf.Pow(elapsedTime / duration, 2.0f); // Adjust this exponent for faster acceleration
-            float newOpacity = Mathf.Lerp(initialOpacity, 1.0f, t);
+            float newOpacity = Mathf.Lerp(initialOpacity, 0.6f, t);
             material.SetFloat("_RadialGradientOpacity", newOpacity);
 
             yield return null; // Wait for the next frame
         }
 
         // Ensure final opacity is set precisely
-        material.SetFloat("_RadialGradientOpacity", 1.0f);
+        material.SetFloat("_RadialGradientOpacity", 0.6f);
     }
 
     // Function to fade out the radial gradient

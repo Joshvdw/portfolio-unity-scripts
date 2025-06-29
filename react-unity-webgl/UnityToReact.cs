@@ -8,7 +8,7 @@ public class UnityToReact : MonoBehaviour
 
     public void sndMsg(string msg)
     {
-        Debug.Log("msg sent from Unity: " + msg);
+//         Debug.Log("msg sent from Unity: " + msg);
 #if UNITY_WEBGL == true && UNITY_EDITOR == false
             UnityToFrontend (msg);
 #endif

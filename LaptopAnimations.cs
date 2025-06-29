@@ -9,6 +9,7 @@ public class LaptopAnimations : MonoBehaviour
     public float xOffset = 7.5f;  // Public property to adjust the X movement offset
     public float scaleMultiplier = 2.0f; // Public property to adjust the scale multiplier
     public VideoPlayer videoPlayer; // Reference to the VideoPlayer component
+    public VidPlayer vidPlayer;
     public string newVideoUrl = "http://example.com/newvideo.mp4"; // New video URL to set during animation
     public string heroVideoUrl = "http://example.com/newvideo.mp4";    
     public Transform transformParent;
@@ -91,7 +92,7 @@ public class LaptopAnimations : MonoBehaviour
             // Calculate position: centered on X, 3 units from top on Y
             Vector3 screenPosition = new Vector3(Screen.width / 2f, 0f, 0f);
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, transformParent.position.z));
-            worldPosition.y = 3.5f;
+            worldPosition.y = 3.25f;
             transformParent.position = worldPosition;
             // Reset Y rotation
             transform.rotation = Quaternion.Euler(10f, 0f, transform.rotation.eulerAngles.z);
@@ -101,29 +102,33 @@ public class LaptopAnimations : MonoBehaviour
         }
     }
 
-    // private void SmoothResetOrientation()
-    // {
-    //     // Kill any active reset sequence
-    //     if (resetSequence.IsActive())
-    //     {
-    //         resetSequence.Kill();
-    //     }
+    private void SmoothResetOrientation()
+    {
+        // Only proceed if on mobile
+        if (!mobileVersion.screenIsMobile()) return;
+
+        // Kill any active reset sequence
+        if (resetSequence.IsActive())
+        {
+            resetSequence.Kill();
+        }
         
-    //     // Clear and reuse the sequence
-    //     resetSequence.SetAutoKill(false);
-    //     resetSequence.Complete(); // Ensure any previous animation is finished
-    //     resetSequence.Kill(true); // Kill and reset the sequence
+        // Clear and reuse the sequence
+        resetSequence.SetAutoKill(false);
+        resetSequence.Complete();
+        resetSequence.Kill(true);
         
-    //     // Get current rotation and create target rotation
-    //     Vector3 currentRotation = transform.rotation.eulerAngles;
-    //     Quaternion targetRotation = Quaternion.Euler(10f, 0f, currentRotation.z);
+        // Get current rotation and create target rotation
+        // Preserve X and Z rotation, but set Y to 0
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+        Quaternion targetRotation = Quaternion.Euler(currentRotation.x, 0f, currentRotation.z);
         
-    //     // Match the mouse movement's floaty feel but twice as slow
-    //     resetSequence.Append(transform.DORotateQuaternion(targetRotation, 1f) // Twice the original duration
-    //         .SetEase(Ease.OutQuad)); // Keep same easing for smooth feel
-            
-    //     resetSequence.Play();
-    // }
+        // Smooth transition over 1 second
+        resetSequence.Append(transform.DORotateQuaternion(targetRotation, 1f)
+            .SetEase(Ease.OutQuad));
+        
+        resetSequence.Play();
+    }
 
     // LOAD IN ANIMATION
     public void LoadInAnimation()
@@ -139,7 +144,7 @@ public class LaptopAnimations : MonoBehaviour
             startPosition.y += 10f;
             transformParent.position = startPosition;
             
-            mySequence.Append(transformParent.DOMoveY(3.5f, duration * 2).SetEase(Ease.OutExpo));
+            mySequence.Append(transformParent.DOMoveY(3.25f, duration * 2).SetEase(Ease.OutExpo));
             
             // Set initial X rotation
             transform.rotation = Quaternion.Euler(10f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
@@ -147,12 +152,13 @@ public class LaptopAnimations : MonoBehaviour
             mySequence.Join(transform.DORotate(new Vector3(0, -360, 0), duration * 2, RotateMode.LocalAxisAdd).SetEase(Ease.InOutQuad));
         }
 
+        vidPlayer.RestartCurrentVideo();
         mySequence.Restart();
     }
 
     public void StartExperience()
     {
-        StartCoroutine(DelayVideoStart());
+//         StartCoroutine(DelayVideoStart());  // REMOVING DELAY FIX ATTTEMPT ***********
         InitializeSequence();
 
         if (mobileVersion.screenIsMobile()) {
@@ -171,7 +177,7 @@ public class LaptopAnimations : MonoBehaviour
             currentRotation.y -= 24f;
             transform.rotation = Quaternion.Euler(currentRotation);
         }
-
+        ChangeVideoUrl(); // REMOVING THIS IF ADDING DELAY BACK IN
         hasStarted = true;
         mySequence.Restart();
     }
@@ -193,6 +199,7 @@ public class LaptopAnimations : MonoBehaviour
             // Only rotate on Y axis
             mySequence.Append(transform.DORotate(new Vector3(0, -360, 0), duration, RotateMode.LocalAxisAdd)
                 .SetEase(Ease.InOutQuad));
+            mySequence.OnComplete(SmoothResetOrientation);
         } else {
             mySequence.Append(transform.DORotate(new Vector3(0, -360, 0), duration, RotateMode.LocalAxisAdd)
                 .SetEase(Ease.InOutQuad));
@@ -211,6 +218,7 @@ public class LaptopAnimations : MonoBehaviour
             // Only rotate on Y axis
             mySequence.Append(transform.DORotate(new Vector3(0, 360, 0), duration, RotateMode.LocalAxisAdd)
                 .SetEase(Ease.InOutQuad));
+            mySequence.OnComplete(SmoothResetOrientation);
         } else {
             mySequence.Append(transform.DORotate(new Vector3(0, 360, 0), duration, RotateMode.LocalAxisAdd)
                 .SetEase(Ease.InOutQuad));
@@ -271,8 +279,10 @@ public class LaptopAnimations : MonoBehaviour
 
     public void BackToHero()
     {
-        videoPlayer.url = heroVideoUrl;
-        videoPlayer.Prepare();
+//         videoPlayer.url = heroVideoUrl;
+//         videoPlayer.Prepare();
+//         videoPlayer.prepareCompleted += vidPlayer.PlayVideoPostSetup;
+        vidPlayer.SetupVideo(heroVideoUrl);
 
         InitializeSequence();
 
@@ -302,6 +312,7 @@ public class LaptopAnimations : MonoBehaviour
     {
         videoPlayer.url = newVideoUrl;
         videoPlayer.Prepare(); // Prepare the video to play
+        videoPlayer.prepareCompleted += vidPlayer.PlayVideoPostSetup;
     }
 
     public void ScaleLaptopToSmall()
@@ -386,7 +397,7 @@ public class LaptopAnimations : MonoBehaviour
     {
         Vector3 screenPosition = new Vector3(Screen.width / 2f, 0f, 0f);
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, transformParent.position.z));
-        worldPosition.y = 3.5f;
+        worldPosition.y = 2.5f;
         transformParent.position = worldPosition;
 
         // Reset scale

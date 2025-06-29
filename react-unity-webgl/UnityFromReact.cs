@@ -24,8 +24,8 @@ public class UnityFromReact : MonoBehaviour
     // NAV HERO SCENE
     public void SetHeroScene()
     {
-        animScript.BackToHero();
         vidScript.ResetWorkProgressIndex();
+        animScript.BackToHero();
         gradientScript.ReverseFadeOutRedAndFadeInRadialGradient();
     }
 
