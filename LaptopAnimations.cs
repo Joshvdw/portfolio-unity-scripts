@@ -14,7 +14,7 @@ public class LaptopAnimations : MonoBehaviour
     public string heroVideoUrl = "http://example.com/newvideo.mp4";    
     public Transform transformParent;
     private Sequence mySequence;
-    private Sequence resetSequence;
+    private Sequence resetSequence; 
     private bool isOffScreen = false;
     public bool hasStarted = false; 
     public MobileVersion mobileVersion;
